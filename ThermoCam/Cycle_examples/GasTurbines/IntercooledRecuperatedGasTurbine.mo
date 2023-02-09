@@ -1,0 +1,146 @@
+within ThermoCam.Cycle_examples.GasTurbines;
+
+model IntercooledRecuperatedGasTurbine
+
+//Declare inputs
+  package Medium_in = ThermoCam.Media.Air_NASA;
+  package Medium_out = ThermoCam.Media.FlueGas_NASA;
+  package Medium_intercooling = ThermoCam.Media.Water_CP;
+  //Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
+  //Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
+  
+  //Ambient conditions
+  parameter Real Tcold = 288.15 "unit=K";
+  parameter Real pcold = 101325.0 "unit=Pa";
+  //Specify added heat in the combustion chamber
+  parameter Real Q_hot = 100000.0 "unit=W";
+  //Compressor pressure ratio
+  parameter Real ph_pc_lp = 4.0;
+  parameter Real ph_pc_hp = 4.0;
+  Real phot_lp "unit=Pa";
+  Real phot_hp "unit=Pa";
+  //Massflow in gas turbine
+  parameter Real massflow_air = 1.0 "unit =kg/s";
+  //Massflow fuel
+  parameter Real massflow_fuel = 0.0 "unit=kg/s";
+  //Isentropic effiency compressor_lp
+  parameter Real epsilon_comp_lp = 1.0 "unit = -";
+  //Isentropic effiency compressor_hp
+  parameter Real epsilon_comp_hp = 1.0 "unit = -";
+  //Isentropic efficiency turbine
+  parameter Real epsilon_turb = 1.0 "unit = -";
+  
+  //Intercooler inputs
+  //Admissible pressure drop hot side
+  parameter Real DPhot = 5000.0 "unit=Pa";
+  //Admissible pressure drop cold side
+  parameter Real DPcold = 5000.0 "unit=Pa";
+  //Minimum admissible temperature difference
+  parameter Real DTpinch = 10.0 "unit=K";
+  //Desired decrease in temperature of the hot fluid
+  parameter Real DThot = 50.0 "unit=K";
+  //Incoming temperature cooling medium
+  parameter Real Tcool = 293.15 "unit=K";
+  //Incoming pressure cooling medium
+  parameter Real pcool = 101325.0 "unit=Pa";
+  
+  //recuperator inputs
+  //Admissible pressure drop hot side
+  parameter Real DPhot_recup = 5000.0 "unit=Pa";
+  //Admissible pressure drop cold side
+  parameter Real DPcold_recup = 5000.0 "unit=Pa";
+  //Desired decrease in temperature of the hot fluid
+  parameter Real DThot_recup = 10.0 "unit=K";
+
+
+
+
+
+//Declare class instances (must redeclare medium in all instances)
+  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air) annotation(
+    Placement(visible = true, transformation(origin = {-230, 12}, extent = {{-18, -18}, {18, 18}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecInandComp(redeclare package Medium = Medium_in) annotation(
+    Placement(visible = true, transformation(origin = {-184, 14}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  ThermoCam.Units.Mechanical.Compressor compressor_lp(redeclare package Medium = Medium_in, epsilon_s = epsilon_comp_lp) annotation(
+    Placement(visible = true, transformation(origin = {-153, 15}, extent = {{-19, -19}, {19, 19}}, rotation = 0)));
+  ThermoCam.Units.Heattransfer.Combustionchamber combustionchamber(redeclare package Medium_in = Medium_in, redeclare package Medium_out =Medium_out,Q_add = Q_hot, m_fuel = massflow_fuel,p_su=phot_hp) annotation(
+    Placement(visible = true, transformation(origin = {47, 19}, extent = {{-21, -21}, {21, 21}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecCombandTurb(redeclare package Medium = Medium_out) annotation(
+    Placement(visible = true, transformation(origin = {86, 20}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  ThermoCam.Units.Mechanical.Turbine turbine(redeclare package Medium = Medium_out, epsilon_s=epsilon_turb) annotation(
+    Placement(visible = true, transformation(origin = {126, 22}, extent = {{-22, -22}, {22, 22}}, rotation = 0)));
+  ThermoCam.Sources_and_sinks.Sinks.Sink_p airout(redeclare package Medium = Medium_out, p_su = pcold) annotation(
+    Placement(visible = true, transformation(origin = {224, 24}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+  ThermoCam.Units.Heattransfer.Intercooler intercooler(redeclare package Medium_cold = Medium_intercooling, redeclare package Medium_hot = Medium_in, DPhot=DPhot,DPcold=DPcold,DThot=DThot,DTpinch=DTpinch,p_su_hot=phot_lp) annotation(
+    Placement(visible = true, transformation(origin = {-92, -38}, extent = {{-28, -28}, {28, 28}}, rotation = 180)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecCompandIntercooler(redeclare package Medium = Medium_in) annotation(
+    Placement(visible = true, transformation(origin = {-128, -4}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  ThermoCam.Sources_and_sinks.Sources.Source_pT waterin(redeclare package Medium = Medium_intercooling, p_su=pcool,T_su=Tcool) annotation(
+    Placement(visible = true, transformation(origin = {-26, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecWaterinandIntercooler(redeclare package Medium = Medium_intercooling) annotation(
+    Placement(visible = true, transformation(origin = {-52, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecIntercoolerandWaterout(redeclare package Medium = Medium_intercooling) annotation(
+    Placement(visible = true, transformation(origin = {-132, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+  ThermoCam.Units.Mechanical.Compressor compressor_hp(redeclare package Medium = Medium_in,epsilon_s=epsilon_comp_hp) annotation(
+    Placement(visible = true, transformation(origin = {-57, 17}, extent = {{-21, -21}, {21, 21}}, rotation = 0)));
+  ThermoCam.Units.Heattransfer.Recuperator recuperator(redeclare package Medium_hot = Medium_out, redeclare package Medium_cold = Medium_in,DPhot=DPhot_recup,DPcold=DPcold_recup,DThot=DThot_recup) annotation(
+    Placement(visible = true, transformation(origin = {-7, 49}, extent = {{-27, 27}, {27, -27}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecIntercoolerandCompressor_hp(redeclare package Medium = Medium_in) annotation(
+    Placement(visible = true, transformation(origin = {-96, 16}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecTurbandRecuperator(redeclare package Medium = Medium_out) annotation(
+    Placement(visible = true, transformation(origin = {132, 54}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+  Units.Streamconnector.Streamconnector connecRecuperatorandAirout(redeclare package Medium = Medium_out) annotation(
+    Placement(visible = true, transformation(origin = {128, 74}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecCompandRecuperator(redeclare package Medium = Medium_in) annotation(
+    Placement(visible = true, transformation(origin = {-24, 16}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  ThermoCam.Units.Streamconnector.Streamconnector connecRecuperatorandComb(redeclare package Medium = Medium_in) annotation(
+    Placement(visible = true, transformation(origin = {14, 20}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  Sources_and_sinks.Sinks.Sink waterout(redeclare package Medium = Medium_intercooling) annotation(
+    Placement(visible = true, transformation(origin = {-160, -48}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+equation
+//Momentum balance
+  phot_lp = ph_pc_lp*pcold;
+  phot_hp = ph_pc_hp*phot_lp;
+  connect(airin.outflow, connecInandComp.inflow) annotation(
+    Line(points = {{-213.44, 12}, {-204.44, 12}, {-204.44, 14}, {-195.44, 14}}));
+  connect(combustionchamber.outflow, connecCombandTurb.inflow) annotation(
+    Line(points = {{63.38, 19.84}, {70.38, 19.84}, {70.38, 20}, {75, 20}}));
+  connect(connecCombandTurb.outflow, turbine.inflow) annotation(
+    Line(points = {{96, 20}, {99, 20}, {99, 22}, {108, 22}}));
+  connect(connecInandComp.outflow, compressor_lp.inflow) annotation(
+    Line(points = {{-174, 14.4}, {-172, 14.4}, {-172, 16.4}, {-170, 16.4}}));
+  connect(compressor_lp.outflow, connecCompandIntercooler.inflow) annotation(
+    Line(points = {{-138.18, 15}, {-138.18, -5}}));
+  connect(connecCompandIntercooler.outflow, intercooler.inflow_hot) annotation(
+    Line(points = {{-118, -4}, {-115, -4}, {-115, -25}}));
+  connect(waterin.outflow, connecWaterinandIntercooler.inflow) annotation(
+    Line(points = {{-35.2, -46}, {-41.2, -46}}));
+  connect(connecWaterinandIntercooler.outflow, intercooler.inflow_cold) annotation(
+    Line(points = {{-62, -45.6}, {-66, -45.6}}));
+  connect(intercooler.outflow_cold, connecIntercoolerandWaterout.inflow) annotation(
+    Line(points = {{-114.96, -45.28}, {-122.96, -45.28}}));
+  connect(connecIntercoolerandCompressor_hp.outflow, compressor_hp.inflow) annotation(
+    Line(points = {{-86, 16}, {-59, 16}, {-59, 17}, {-76, 17}}));
+  connect(intercooler.outflow_hot, connecIntercoolerandCompressor_hp.inflow) annotation(
+    Line(points = {{-70, -23}, {-64, -23}, {-64, -10}, {-107, -10}, {-107, 16}}));
+  connect(recuperator.outflow_hot, connecRecuperatorandAirout.inflow) annotation(
+    Line(points = {{-29, 63}, {-50, 63}, {-50, 92}, {106, 92}, {106, 94}, {118, 94}, {118, 74}}));
+  connect(connecRecuperatorandAirout.outflow, airout.inflow) annotation(
+    Line(points = {{138, 74}, {198, 74}, {198, 24}, {216, 24}}));
+  connect(turbine.outflow, connecTurbandRecuperator.inflow) annotation(
+    Line(points = {{142, 22}, {156, 22}, {156, 54}, {142, 54}}));
+  connect(connecTurbandRecuperator.outflow, recuperator.inflow_hot) annotation(
+    Line(points = {{122, 54}, {102, 54}, {102, 61}, {15, 61}}));
+  connect(compressor_hp.outflow, connecCompandRecuperator.inflow) annotation(
+    Line(points = {{-40, 18}, {-34, 18}, {-34, 16}}));
+  connect(connecCompandRecuperator.outflow, recuperator.inflow_cold) annotation(
+    Line(points = {{-14, 16}, {-12, 16}, {-12, 32}, {-40, 32}, {-40, 42}, {-32, 42}}));
+  connect(recuperator.outflow_cold, connecRecuperatorandComb.inflow) annotation(
+    Line(points = {{16, 42}, {22, 42}, {22, 28}, {-6, 28}, {-6, 20}, {4, 20}}));
+  connect(connecRecuperatorandComb.outflow, combustionchamber.inflow) annotation(
+    Line(points = {{24, 20}, {30, 20}}));
+  connect(connecIntercoolerandWaterout.outflow, waterout.inflow) annotation(
+    Line(points = {{-142, -46}, {-152, -46}, {-152, -48}}));
+  annotation(
+    Icon);
+end IntercooledRecuperatedGasTurbine;

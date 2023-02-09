@@ -1,0 +1,6 @@
+within ThermoCam.Interfaces;
+
+partial package DummyFluid "Empty fluid. Partial model, needs to be redeclared - ThermoCam"
+  extends ExternalMedia.Media.FluidPropMedium;
+  annotation();
+end DummyFluid;
