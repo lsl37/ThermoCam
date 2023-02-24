@@ -9,7 +9,7 @@ model IGT_intercooler_ORC
   package Medium_out = ThermoCam.Media.FlueGas_NASA;
   package Medium_intercooling = ThermoCam.Media.Water_CP;
   package Medium_oil = ThermoCam.Media.TherminolVP1_CP;
-  package Medium_ORC = ThermoCam.Media.Benzene_CP;
+  package Medium_ORC = ThermoCam.Media.Toluene_CP;
   package Medium_condenser_cooling = ThermoCam.Media.Air_CP;
   //////////////////////////////////////////////////////////////
   //Ambient conditions
@@ -142,7 +142,7 @@ model IGT_intercooler_ORC
     Placement(visible = true, transformation(origin = {-300, -12}, extent = {{-24, -24}, {24, 24}}, rotation = 0)));
   ThermoCam.Units.Mechanical.Pump pumpORC(redeclare package Medium = Medium_ORC, epsilon_s = epsilon_pump_orc) annotation(
     Placement(visible = true, transformation(origin = {-321, -65}, extent = {{-17, -17}, {17, 17}}, rotation = 0)));
-  ThermoCam.Sources_and_sinks.Sources.Source_pT condensercoolerin(redeclare package Medium = Medium_condenser_cooling, p_su=pcool_condenser_cooling, Tcool_condenser_cooling) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT condensercoolerin(redeclare package Medium = Medium_condenser_cooling, p_su=pcool_condenser_cooling,T_su= Tcool_condenser_cooling) annotation(
     Placement(visible = true, transformation(origin = {-336, 34}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecCondenserandCoolerout(redeclare package Medium = Medium_condenser_cooling) annotation(
     Placement(visible = true, transformation(origin = {-104, 16}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));

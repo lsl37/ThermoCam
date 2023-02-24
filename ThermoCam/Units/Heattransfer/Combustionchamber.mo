@@ -20,10 +20,10 @@ model Combustionchamber
   parameter Modelica.SIunits.Pressure p_su_start = 2.339e5 "Inlet pressure start value";
   parameter Modelica.SIunits.Pressure p_ex_start = 1.77175e6 "Outlet pressure start value";
   parameter Modelica.SIunits.Temperature T_su_start = 293.15 "Inlet temperature start value";
-  parameter Medium_out.MassFraction Xnom[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
-  parameter Medium_in.MassFraction Xnom_in[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
+  parameter Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X;
+  parameter Medium_in.MassFraction Xnom_in[Medium_in.nX] = Medium_in.reference_X;
   parameter Medium_in.SpecificEnthalpy h_su_start = Medium_in.specificEnthalpy_pTX(p_su_start, T_su_start, Xnom_in) "Inlet enthalpy start value";
-  parameter Medium_out.SpecificEnthalpy h_ex_start = Medium_out.specificEnthalpy_pTX(p_ex_start, T_su_start, Xnom) "Outlet enthalpy start value";
+  parameter Medium_out.SpecificEnthalpy h_ex_start = Medium_out.specificEnthalpy_pTX(p_ex_start, T_su_start, Xnom_out) "Outlet enthalpy start value";
   /****************************************** VARIABLES ******************************************/
   Medium_in.ThermodynamicState FluidIn "Thermodynamic state of the fluid at the inlet";
   Medium_out.ThermodynamicState FluidOut "Thermodynamic state of the fluid at the outlet - isentropic";
@@ -38,7 +38,7 @@ model Combustionchamber
 equation
 /* Fluid Properties */
   FluidIn = Medium_in.setState_phX(p_su, h_su, Xnom_in);
-  FluidOut = Medium_out.setState_phX(p_ex, h_ex, Xnom);
+  FluidOut = Medium_out.setState_phX(p_ex, h_ex, Xnom_out);
 //Momentum balance (assumes negligible pressure drop)
   p_su = p_ex;
   p_su = inflow.p;

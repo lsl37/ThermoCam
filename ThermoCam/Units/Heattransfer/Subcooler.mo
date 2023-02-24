@@ -7,8 +7,8 @@ model Subcooler
      choicesAllMatching = true);
   replaceable package Medium_hot = ThermoCam.Media.DummyFluid constrainedby Modelica.Media.Interfaces.PartialMedium "Medium model" annotation(
      choicesAllMatching = true);
-  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X "Nominal composition";
-  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X "Nominal composition";
+  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X;
+  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X;
   
   //Define admissible pressure drop for both sides
   parameter Modelica.SIunits.PressureDifference DPcold "unit=Pa";

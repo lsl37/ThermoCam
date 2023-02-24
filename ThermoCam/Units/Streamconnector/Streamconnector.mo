@@ -12,7 +12,7 @@ model Streamconnector
   //Initialisation variables
   parameter Modelica.SIunits.Pressure p_nom = 1e5 "Nominal inlet pressure";
   parameter Modelica.SIunits.Temperature T_nom = 423.15 "Nominal inlet temperature";
-  Medium.MassFraction Xnom[Medium.nX] = Medium.reference_X "Nominal composition";
+  parameter Medium.MassFraction Xnom[Medium.nX] = Medium.reference_X;
   
   /*FluidState */
   Medium.ThermodynamicState fluidState(p(start = p_nom), T(start = T_nom));

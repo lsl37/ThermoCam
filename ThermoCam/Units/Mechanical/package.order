@@ -3,3 +3,7 @@ Expander
 Compressor
 Pump
 Valve
+Compressor_polytropic
+Pump_polytropic
+Turbine_polytropic
+Expander_polytropic

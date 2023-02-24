@@ -10,7 +10,7 @@ model Sink_p
     Placement(visible = true, transformation(origin = {82, -6}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {82, -6}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
 
   Medium.SpecificEnthalpy h_su(start = h_su_start);
-  parameter Medium.AbsolutePressure p_su(start = p_su_start);
+  Medium.AbsolutePressure p_su(start = p_su_start);
   Medium.ThermodynamicState FluidIn(p(start = p_nom), T(start = T_nom)) "Thermodynamic state of the fluid at the outlet - isentropic";
  
   
@@ -19,7 +19,7 @@ model Sink_p
   parameter Modelica.SIunits.Temperature T_su_start = 293.15 "Inlet temperature start value";
   parameter Modelica.SIunits.Pressure p_nom = 1e5 "Nominal inlet pressure";
   parameter Modelica.SIunits.Temperature T_nom = 423.15 "Nominal inlet temperature";
-  parameter Medium.MassFraction Xnom[Medium.nX] = Medium.reference_X "Nominal gas composition";
+  parameter Medium.MassFraction Xnom[Medium.nX] = Medium.reference_X;
   parameter Medium.SpecificEnthalpy h_su_start = Medium.specificEnthalpy_pTX(p_su_start, T_su_start, Xnom) "Inlet enthalpy start value";
   
 equation

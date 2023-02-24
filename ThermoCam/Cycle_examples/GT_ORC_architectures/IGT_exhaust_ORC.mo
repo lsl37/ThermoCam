@@ -5,11 +5,12 @@ model IGT_exhaust_ORC
   //Model for a intercooled gas turbine where the cooling medium is water, with an ORC coupled to the exhaust
   ////////////////////////////////////////////////////////////////////////////////
   //Declare inputs
+  //Working fluids in cycle
   package Medium_in = ThermoCam.Media.Air_NASA;
   package Medium_out = ThermoCam.Media.FlueGas_NASA;
   package Medium_intercooling = ThermoCam.Media.Water_CP;
   package Medium_oil = ThermoCam.Media.TherminolVP1_CP;
-  package Medium_ORC = ThermoCam.Media.Benzene_CP;
+  package Medium_ORC = ThermoCam.Media.Toluene_CP;
   package Medium_condenser_cooling = ThermoCam.Media.Air_CP;
   //////////////////////////////////////////////////////////////
   //Ambient conditions
@@ -150,7 +151,7 @@ model IGT_exhaust_ORC
     Placement(visible = true, transformation(origin = {-156, 134}, extent = {{-24, -24}, {24, 24}}, rotation = 0)));
   ThermoCam.Units.Mechanical.Pump pumpORC(redeclare package Medium = Medium_ORC, epsilon_s = epsilon_pump_orc) annotation(
     Placement(visible = true, transformation(origin = {-177, 81}, extent = {{-17, -17}, {17, 17}}, rotation = 0)));
-  ThermoCam.Sources_and_sinks.Sources.Source_pT condensercoolerin(redeclare package Medium = Medium_condenser_cooling, p_su=pcool_condenser_cooling, Tcool_condenser_cooling) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT condensercoolerin(redeclare package Medium = Medium_condenser_cooling, p_su=pcool_condenser_cooling,T_su= Tcool_condenser_cooling) annotation(
     Placement(visible = true, transformation(origin = {-134, 174}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
   Units.Streamconnector.Streamconnector connecCondenserandCoolerout(redeclare package Medium = Medium_condenser_cooling) annotation(
     Placement(visible = true, transformation(origin = {80, 168}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));

@@ -7,8 +7,8 @@ model Recuperator
      choicesAllMatching = true);
   replaceable package Medium_hot = ThermoCam.Media.DummyFluid constrainedby Modelica.Media.Interfaces.PartialMedium "Medium model" annotation(
      choicesAllMatching = true);
-  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X "Nominal composition";
-  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X "Nominal composition";
+  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X;
+  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X;
   
   //Define admissible pressure drop for both sides
   parameter Modelica.SIunits.PressureDifference DPcold "unit=Pa";
@@ -96,16 +96,8 @@ equation
   outflow_hot.p = p_ex_hot;
 /*Energy balance*/
   Q_cold + Q_hot = 0;
-  if m_flow_cold > 0.0 then
-    Q_cold = m_flow_cold*(h_ex_cold - h_su_cold) "Total heat flow";
-  else
-    Q_cold = abs(m_flow_cold)*(h_ex_cold - h_su_cold) "Total heat flow";
-  end if;
-  if m_flow_hot > 0.0 then
-    Q_hot = m_flow_hot*(h_ex_hot - h_su_hot) "Total heat flow";
-  else
-    Q_hot = abs(m_flow_hot)*(h_ex_hot - h_su_hot) "Total heat flow";
-  end if;
+  Q_hot = abs(m_flow_hot)*(h_ex_hot-h_su_hot);
+  Q_cold = abs(m_flow_cold)*(h_ex_cold - h_su_cold);
 
 /*Mass flows, mass balance */
   m_flow_cold = inflow_cold.m_dot;

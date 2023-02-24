@@ -1,0 +1,2 @@
+within ThermoCam.Media;
+package HumidFlueGas = FluegasSteam_NASA(reference_X={0.0,1.0}) "Fluegas and steam mixture (no condensation!, pseudo-mixture)";

@@ -1,12 +1,12 @@
-within ThermoCam.Cycle_examples.GasTurbines;
+within ThermoCam.Tests.Media;
 
 model SimpleGasTurbine
 
 //Declare inputs
   package Medium_in = ThermoCam.Media.Air_NASA;
   package Medium_out = ThermoCam.Media.FlueGas_NASA;
-  parameter Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
-  parameter Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
+  Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
+  Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
   
   //Ambient conditions
   parameter Real Tcold = 288.15 "unit=K";
@@ -30,23 +30,23 @@ model SimpleGasTurbine
 
 
 //Declare class instances (must redeclare medium in all instances)
-  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air,Xnom = Xnom) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air) annotation(
     Placement(visible = true, transformation(origin = {-152, -4}, extent = {{-18, -18}, {18, 18}}, rotation = 0)));
-  ThermoCam.Units.Streamconnector.Streamconnector connecInandComp(redeclare package Medium = Medium_in,Xnom=Xnom) annotation(
+  ThermoCam.Units.Streamconnector.Streamconnector connecInandComp(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-118, -4}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  ThermoCam.Units.Mechanical.Compressor compressor(redeclare package Medium = Medium_in, epsilon_s = epsilon_comp,Xnom=Xnom) annotation(
+  ThermoCam.Units.Mechanical.Compressor compressor(redeclare package Medium = Medium_in, epsilon_s = epsilon_comp) annotation(
     Placement(visible = true, transformation(origin = {-83, -3}, extent = {{-19, -19}, {19, 19}}, rotation = 0)));
-  ThermoCam.Units.Streamconnector.Streamconnector connecCompandComb(redeclare package Medium = Medium_in,Xnom=Xnom) annotation(
+  ThermoCam.Units.Streamconnector.Streamconnector connecCompandComb(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-48, -4}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  ThermoCam.Units.Heattransfer.Combustionchamber combustionchamber(redeclare package Medium_in = Medium_in, redeclare package Medium_out =Medium_out,Q_add = Q_hot, m_fuel = massflow_fuel,p_su=phot,Xnom_in=Xnom,Xnom_out=Xnom_out) annotation(
+  ThermoCam.Units.Heattransfer.Combustionchamber combustionchamber(redeclare package Medium_in = Medium_in, redeclare package Medium_out =Medium_out,Q_add = Q_hot, m_fuel = massflow_fuel,p_su=phot) annotation(
     Placement(visible = true, transformation(origin = {-1, -3}, extent = {{-21, -21}, {21, 21}}, rotation = 0)));
-  ThermoCam.Units.Streamconnector.Streamconnector connecCombandTurb(redeclare package Medium = Medium_out,Xnom=Xnom_out) annotation(
+  ThermoCam.Units.Streamconnector.Streamconnector connecCombandTurb(redeclare package Medium = Medium_out) annotation(
     Placement(visible = true, transformation(origin = {40, -2}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  ThermoCam.Units.Mechanical.Turbine turbine(redeclare package Medium = Medium_out, epsilon_s=epsilon_turb,Xnom=Xnom_out) annotation(
+  ThermoCam.Units.Mechanical.Turbine turbine(redeclare package Medium = Medium_out, epsilon_s=epsilon_turb) annotation(
     Placement(visible = true, transformation(origin = {82, 0}, extent = {{-22, -22}, {22, 22}}, rotation = 0)));
-  ThermoCam.Sources_and_sinks.Sinks.Sink_p airout(redeclare package Medium = Medium_out, p_su = pcold,Xnom=Xnom_out) annotation(
+  ThermoCam.Sources_and_sinks.Sinks.Sink_p airout(redeclare package Medium = Medium_out, p_su = pcold) annotation(
     Placement(visible = true, transformation(origin = {158, 0}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
-  ThermoCam.Units.Streamconnector.Streamconnector connecTurbandOut(redeclare package Medium = Medium_out,Xnom=Xnom_out) annotation(
+  ThermoCam.Units.Streamconnector.Streamconnector connecTurbandOut(redeclare package Medium = Medium_out) annotation(
     Placement(visible = true, transformation(origin = {124, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
 equation
   //Momentum balance

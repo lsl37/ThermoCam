@@ -7,8 +7,8 @@ model Evaporator
      choicesAllMatching = true);
   replaceable package Medium_hot = ThermoCam.Media.DummyFluid constrainedby Modelica.Media.Interfaces.PartialMedium "Medium model" annotation(
      choicesAllMatching = true);
-  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X "Nominal composition";
-  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X "Nominal composition";
+  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X;
+  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X;
   /*Ports */
   Interfaces.Inflow inflow_cold(redeclare package Medium = Medium_cold) annotation(
     Placement(visible = true, transformation(origin = {-76, 28}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {-76, 28}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
@@ -53,6 +53,8 @@ model Evaporator
   
   Medium_cold.SpecificEnthalpy h_su_cold(start = h_su_start);
   Medium_cold.SpecificEnthalpy h_ex_cold(start = h_ex_start);
+  Medium_hot.AbsolutePressure p_su_hot(start = p_su_start);
+  Medium_hot.AbsolutePressure p_ex_hot(start = p_ex_start);
   Medium_cold.AbsolutePressure p_su_cold(start = p_su_start);
   Medium_cold.AbsolutePressure p_ex_cold(start = p_ex_start);
   Medium_cold.Temperature T_su_cold(start = T_su_start);
@@ -75,6 +77,8 @@ equation
 /*Momentum balance*/
   p_ex_cold = p_su_cold - DPcold;
   inflow_hot.p = outflow_hot.p + DPhot;
+  p_su_hot = inflow_hot.p;
+  p_ex_hot = outflow_hot.p;
 /*Energy balance*/
   if m_flow_cold < 0.0 then
     Q_dot_cold = abs(m_flow_cold)*(h_ex_cold - h_su_cold) "Total heat flow";
@@ -89,7 +93,7 @@ equation
 /*Mass flows, mass balance */
   m_flow_cold = inflow_cold.m_dot;
   outflow_cold.m_dot = -m_flow_cold;
-  m_flow_hot = outflow_hot.m_dot;
+  m_flow_hot = inflow_hot.m_dot;
   outflow_hot.m_dot = -m_flow_hot;
 /*pressures*/
   inflow_cold.p = p_su_cold;

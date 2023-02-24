@@ -9,8 +9,8 @@ model Condenser
      choicesAllMatching = true);
   replaceable package Medium_cold = ThermoCam.Media.DummyFluid constrainedby Modelica.Media.Interfaces.PartialMedium "Medium model" annotation(
      choicesAllMatching = true);
-  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X "Nominal composition";
-  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X "Nominal composition";
+  parameter Medium_hot.MassFraction Xnom_hot[Medium_hot.nX] = Medium_hot.reference_X;
+  parameter Medium_cold.MassFraction Xnom_cold[Medium_cold.nX] = Medium_cold.reference_X;
   /*Ports */
   Interfaces.Inflow inflow_cold(redeclare package Medium = Medium_cold) annotation(
     Placement(visible = true, transformation(origin = {-82, 28}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {-82, 28}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
@@ -56,6 +56,8 @@ model Condenser
   Medium_hot.SpecificEnthalpy h_ex_hot(start = h_ex_start);
   Medium_hot.AbsolutePressure p_su_hot(start = p_su_start);
   Medium_hot.AbsolutePressure p_ex_hot(start = p_ex_start);
+  Medium_cold.AbsolutePressure p_su_cold(start = p_su_start);
+  Medium_cold.AbsolutePressure p_ex_cold(start = p_ex_start);
   
   //Condenser specific variables
   Medium_hot.Temperature T_su_hot(start = T_su_start);
@@ -79,6 +81,8 @@ equation
 /*Momentum balance*/
   p_ex_hot = p_su_hot - DPhot;
   inflow_cold.p = outflow_cold.p + DPcold;
+  p_su_cold = inflow_cold.p;
+  p_ex_cold = outflow_cold.p;
 /*Energy balance*/
   if m_flow_hot < 0.0 then
     Q_dot_hot = abs(m_flow_hot)*(h_ex_hot - h_su_hot) "Total heat flow";

@@ -1,4 +1,4 @@
-within ThermoCam.Cycle_examples.GasTurbines;
+within ThermoCam.Tests.Media;
 
 model IntercooledGasTurbine
 
@@ -6,9 +6,8 @@ model IntercooledGasTurbine
   package Medium_in = ThermoCam.Media.Air_NASA;
   package Medium_out = ThermoCam.Media.FlueGas_NASA;
   package Medium_intercooling = ThermoCam.Media.Water_CP;
-  Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
-  Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
-  Medium_intercooling.MassFraction Xnom_intercooling[Medium_intercooling.nX] = Medium_intercooling.reference_X "Nominal composition";
+  //Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
+  //Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
   
   //Ambient conditions
   parameter Real Tcold = 288.15 "unit=K";
@@ -76,16 +75,16 @@ model IntercooledGasTurbine
     Placement(visible = true, transformation(origin = {-52, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecIntercoolerandWaterout(redeclare package Medium = Medium_intercooling) annotation(
     Placement(visible = true, transformation(origin = {-132, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+  ThermoCam.Sources_and_sinks.Sinks.Sink waterout(redeclare package Medium = Medium_intercooling) annotation(
+    Placement(visible = true, transformation(origin = {-168, -44}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   ThermoCam.Units.Mechanical.Compressor compressor_hp(redeclare package Medium = Medium_in,epsilon_s=epsilon_comp_hp) annotation(
     Placement(visible = true, transformation(origin = {-17, 17}, extent = {{-21, -21}, {21, 21}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecIntercoolerandCompressor_hp(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-50, 16}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecCompandComb(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {14, 16}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  ThermoCam.Sources_and_sinks.Sinks.Sink waterout(redeclare package Medium = Medium_intercooling) annotation(
-    Placement(visible = true, transformation(origin = {-164, -46}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
 equation
-//Momentum balance
+  //Momentum balance
   phot_lp = ph_pc_lp*pcold;
   phot_hp = ph_pc_hp*phot_lp;
   connect(airin.outflow, connecInandComp.inflow) annotation(
@@ -108,6 +107,8 @@ equation
     Line(points = {{-35.2, -46}, {-41.2, -46}}));
   connect(connecWaterinandIntercooler.outflow, intercooler.inflow_cold) annotation(
     Line(points = {{-62, -45.6}, {-66, -45.6}}));
+  connect(connecIntercoolerandWaterout.outflow, waterout.inflow) annotation(
+    Line(points = {{-142, -45.6}, {-160, -45.6}, {-160, -43.6}}));
   connect(intercooler.outflow_cold, connecIntercoolerandWaterout.inflow) annotation(
     Line(points = {{-114.96, -45.28}, {-122.96, -45.28}}));
   connect(intercooler.outflow_hot, connecIntercoolerandCompressor_hp.inflow) annotation(
@@ -118,8 +119,6 @@ equation
     Line(points = {{-1, 17}, {2.5, 17}, {2.5, 16}, {3, 16}}));
   connect(connecCompandComb.outflow, combustionchamber.inflow) annotation(
     Line(points = {{24, 16}, {30, 16}, {30, 20}}));
-  connect(connecIntercoolerandWaterout.outflow, waterout.inflow) annotation(
-    Line(points = {{-142, -46}, {-156, -46}}));
   annotation(
     Icon);
 end IntercooledGasTurbine;

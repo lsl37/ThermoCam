@@ -1,0 +1,13 @@
+within ThermoCam.Media;
+package FluegasSteam_NASA "Fluegas and steam mixture (no condensation!, pseudo-mixture)"
+  extends Modelica.Media.IdealGases.Common.MixtureGasNasa(
+     mediumName="MoistFlueGas",
+     data={Modelica.Media.IdealGases.Common.SingleGasesData.H2O, ThermoCam.Media.FlueGas_NASA},
+    fluidConstants={Modelica.Media.IdealGases.Common.SingleGasesData.H2O,
+      ThermoCam.Media.FlueGas_NASA},
+     substanceNames = {"Water","FlueGas"},
+     reference_X={0.0,1.0});
+  annotation (Documentation(info="<html>
+
+</html>"));
+end FluegasSteam_NASA;
