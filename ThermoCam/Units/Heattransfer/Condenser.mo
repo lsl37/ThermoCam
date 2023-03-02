@@ -74,7 +74,11 @@ model Condenser
 equation
 
   /* Fluid Properties */
-  FluidInHot = Medium_hot.setState_phX(p_su_hot, inflow_hot.h_outflow, Xnom_hot);
+  if size(inflow_hot.Xi_outflow, 1) > 0 then
+    FluidInHot = Medium_hot.setState_phX(p_su_hot, inflow_hot.h_outflow, inflow_hot.Xi_outflow);
+  else 
+    FluidInHot = Medium_hot.setState_phX(p_su_hot, inflow_hot.h_outflow, Xnom_hot);
+  end if;
   h_su_hot = Medium_hot.specificEnthalpy(FluidInHot);
   h_ex_hot = Medium_hot.specificEnthalpy(FluidOutHot);
 /*equations */
@@ -104,10 +108,22 @@ equation
   p_ex_hot = Medium_hot.saturationPressure(T_cond);
   FluidOutHot = Medium_hot.setState_px(p_ex_hot, 0.0);
   FluidInterHot = Medium_hot.setState_px(p_ex_hot, 1.0);
-  T_su_hot = Medium_hot.temperature_phX(p_su_hot, h_su_hot, Xnom_hot);
+  if size(inflow_hot.Xi_outflow, 1) > 0 then
+    T_su_hot = Medium_hot.temperature_phX(p_su_hot, h_su_hot, inflow_hot.Xi_outflow);
+  else 
+    T_su_hot = Medium_hot.temperature_phX(p_su_hot, h_su_hot, Xnom_hot);
+  end if;
   h_inter_hot = Medium_hot.specificEnthalpy(FluidInterHot);
-  T_inter_hot = Medium_hot.temperature_phX(p_ex_hot, h_inter_hot, Xnom_hot);
-  T_su_cold = Medium_cold.temperature_phX(outflow_cold.p, inflow_cold.h_outflow, Xnom_cold);
+  if size(inflow_hot.Xi_outflow, 1) > 0 then
+    T_inter_hot = Medium_hot.temperature_phX(p_ex_hot, h_inter_hot, inflow_hot.Xi_outflow);
+  else 
+    T_inter_hot = Medium_hot.temperature_phX(p_ex_hot, h_inter_hot, Xnom_hot);
+  end if;
+  if size(inflow_cold.Xi_outflow, 1) > 0 then
+    T_su_cold = Medium_cold.temperature_phX(outflow_cold.p, inflow_cold.h_outflow, inflow_cold.Xi_outflow);
+  else 
+    T_su_cold = Medium_cold.temperature_phX(outflow_cold.p, inflow_cold.h_outflow, Xnom_cold);
+  end if;
 ////////////////////////////////////////
   T_inter_cold = T_inter_hot - DTpinch;
   slope_outer = (T_inter_cold - T_su_cold)/(h_inter_hot - h_ex_hot);
@@ -117,10 +133,18 @@ equation
   else
     T_ex_cold = T_su_cold + slope_outer*(h_su_hot - h_ex_hot);
   end if;
-  T_ex_cold = Medium_cold.temperature_phX(outflow_cold.p, outflow_cold.h_outflow, Xnom_cold);
+  if size(outflow_cold.Xi_outflow, 1) > 0 then
+    T_ex_cold = Medium_cold.temperature_phX(outflow_cold.p, outflow_cold.h_outflow, outflow_cold.Xi_outflow);
+  else 
+    T_ex_cold = Medium_cold.temperature_phX(outflow_cold.p, outflow_cold.h_outflow, Xnom_cold);
+  end if;
 ///////////////////////////////////////
   Q_dot_cold = -Q_dot_hot;
   Q_dot_cold = abs(m_flow_cold)*(outflow_cold.h_outflow - inflow_cold.h_outflow);
+  
+//Species balance
+  inflow_cold.Xi_outflow = outflow_cold.Xi_outflow;
+  inflow_hot.Xi_outflow = outflow_hot.Xi_outflow;
   
 annotation(
     Icon(graphics = {Line(origin = {2, -35}, points = {{54, -1}, {-54, 1}}, color = {255, 0, 0}, thickness = 0.5, arrow = {Arrow.None, Arrow.Open}, arrowSize = 10), Line(origin = {2, 48}, points = {{-52, 0}, {52, 0}}, color = {85, 85, 255}, thickness = 0.5, arrow = {Arrow.None, Arrow.Open}, arrowSize = 10), Line(origin = {8.01, -11.26}, points = {{-72.0094, -6.7437}, {-60.0094, 1.2563}, {-38.0094, -6.7437}, {-24.0094, 5.2563}, {-6.00941, -2.7437}, {11.9906, 7.2563}, {29.9906, -4.7437}, {45.9906, 7.2563}, {61.9906, -6.7437}, {71.9906, 1.2563}}, color = {255, 0, 0}, thickness = 0.5), Text(origin = {8, 8}, extent = {{-58, 38}, {58, -38}}, textString = "Condenser"), Line(origin = {3.4, 22.23}, points = {{-68.0272, -5.73184}, {-50.0272, 4.26816}, {-34.0272, -5.73184}, {-14.0272, 4.26816}, {-0.0272067, -5.73184}, {21.9728, 6.26816}, {37.9728, -5.73184}, {57.9728, 4.26816}, {67.9728, -5.73184}, {67.9728, -5.73184}}, color = {0, 85, 255}, thickness = 0.5, arrow = {Arrow.None, Arrow.Open})}),

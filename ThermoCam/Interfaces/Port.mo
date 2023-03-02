@@ -13,7 +13,8 @@ partial connector Port
   //Specific thermodynamic enthalpy close to the connection point if m_flow < 0
   stream Medium.SpecificEnthalpy h_outflow "unit = J/kg";
   
-  //stream Medium.MassFraction Xi_outflow[Medium.nXi] "Independent mixture mass fractions m_i/m close to the connection point if m_flow < 0";
+  //Mass fractions of medium 
+  stream Medium.MassFraction Xi_outflow[Medium.nXi] "Independent mixture mass fractions m_i/m close to the connection point if m_flow < 0";
   annotation(
     Icon(graphics = {Rectangle(fillColor = {159, 159, 223}, fillPattern = FillPattern.HorizontalCylinder, extent = {{-80, 40}, {80, -40}})}),
     Diagram(graphics = {Rectangle(fillColor = {159, 159, 223}, fillPattern = FillPattern.HorizontalCylinder, extent = {{-80, 40}, {80, -40}})}));

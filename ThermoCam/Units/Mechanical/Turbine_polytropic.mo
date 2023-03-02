@@ -51,7 +51,11 @@ model Turbine_polytropic
 equation
 
 /* Fluid Properties */
-   FluidIn = Medium.setState_phX(p_su, h_su, Xnom);
+   if size(inflow.Xi_outflow,1) > 0 then
+      FluidIn = Medium.setState_phX(p_su, h_su, inflow.Xi_outflow);
+   else
+      FluidIn = Medium.setState_phX(p_su, h_su, Xnom);
+   end if;
    T_su = Medium.temperature(FluidIn);
 /* Pressure ratio per stage */
    // Total pressure ratio
@@ -65,14 +69,22 @@ equation
         T_stage[i] =  T_su/(((PR_perstage)^((epsilon_p*(gamma_stage[i]-1.0))/(gamma_stage[i]))));
         p_stage[i] = p_su/PR_perstage;
      else
-        FluidStateInArray[i] = Medium.setState_pTX(p_stage[i-1],T_stage[i-1],Xnom);
+        if size(inflow.Xi_outflow,1) > 0 then
+          FluidStateInArray[i] = Medium.setState_pTX(p_stage[i-1],T_stage[i-1],inflow.Xi_outflow);
+        else 
+          FluidStateInArray[i] = Medium.setState_pTX(p_stage[i-1],T_stage[i-1], Xnom);
+        end if;
         gamma_stage[i] = Medium.isentropicExponent(FluidStateInArray[i]);
         T_stage[i] =  T_stage[i-1]/(((PR_perstage)^((epsilon_p*(gamma_stage[i]-1.0))/(gamma_stage[i]))));
         p_stage[i] = p_stage[i-1]/PR_perstage;
      end if;
    end for;
   T_ex = T_stage[n_stages];
-  FluidOut = Medium.setState_pTX(p_ex, T_ex, Xnom);
+  if size(outflow.Xi_outflow,1) > 0 then
+    FluidOut = Medium.setState_pTX(p_ex, T_ex, outflow.Xi_outflow);
+  else 
+    FluidOut = Medium.setState_pTX(p_ex, T_ex, Xnom);
+  end if;
   h_ex = Medium.specificEnthalpy(FluidOut);
   
   
@@ -83,6 +95,9 @@ equation
 /* Enthalpies */
   h_su = inflow.h_outflow;
   outflow.h_outflow = h_ex;
+  
+/*Species balance*/
+  inflow.Xi_outflow = outflow.Xi_outflow;
   
   
 /*Mass flows, mass balance */

@@ -1,0 +1,4 @@
+within ThermoCam.Media;
+package WaterVapour "This fluid species is used for mixing with air and fluegas. It therefore acts as an ideal gas"
+  extends Modelica.Media.IdealGases.Common.MixtureGasNasa(mediumName = "HumidAir", data = {Modelica.Media.IdealGases.Common.SingleGasesData.O2, Modelica.Media.IdealGases.Common.SingleGasesData.H2O, Modelica.Media.IdealGases.Common.SingleGasesData.Ar, Modelica.Media.IdealGases.Common.SingleGasesData.N2, Modelica.Media.IdealGases.Common.SingleGasesData.CO2}, fluidConstants = {Modelica.Media.IdealGases.Common.FluidData.O2, Modelica.Media.IdealGases.Common.FluidData.H2O, Modelica.Media.IdealGases.Common.FluidData.Ar, Modelica.Media.IdealGases.Common.FluidData.N2,Modelica.Media.IdealGases.Common.FluidData.CO2}, substanceNames = {"Oxygen", "Water", "Argon", "Nitrogen","Carbondioxide"}, reference_X = {0.0,1.0,0.0,0.0,0.0}, referenceChoice = Modelica.Media.Interfaces.Choices.ReferenceEnthalpy.ZeroAt25C);
+end WaterVapour;

@@ -6,9 +6,11 @@ model IntercooledGasTurbine
   package Medium_in = ThermoCam.Media.Air_NASA;
   package Medium_out = ThermoCam.Media.FlueGas_NASA;
   package Medium_intercooling = ThermoCam.Media.Water_CP;
-  Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
-  Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
-  Medium_intercooling.MassFraction Xnom_intercooling[Medium_intercooling.nX] = Medium_intercooling.reference_X "Nominal composition";
+  parameter Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
+  parameter Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
+  //parameter Medium_intercooling.MassFraction Xnom_intercooling[Medium_intercooling.nX] = Medium_intercooling.reference_X "Nominal composition";
+  parameter Real Xnom_intercooling[0];
+  
   
   //Ambient conditions
   parameter Real Tcold = 288.15 "unit=K";
@@ -50,7 +52,7 @@ model IntercooledGasTurbine
 
 
 //Declare class instances (must redeclare medium in all instances)
-  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air,X=Xnom) annotation(
     Placement(visible = true, transformation(origin = {-230, 12}, extent = {{-18, -18}, {18, 18}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecInandComp(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-184, 14}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
@@ -70,7 +72,7 @@ model IntercooledGasTurbine
     Placement(visible = true, transformation(origin = {-92, -38}, extent = {{-28, -28}, {28, 28}}, rotation = 180)));
   ThermoCam.Units.Streamconnector.Streamconnector connecCompandIntercooler(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-128, -4}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  ThermoCam.Sources_and_sinks.Sources.Source_pT waterin(redeclare package Medium = Medium_intercooling, p_su=pcool,T_su=Tcool) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT waterin(redeclare package Medium = Medium_intercooling, p_su=pcool,T_su=Tcool, X=Xnom_intercooling) annotation(
     Placement(visible = true, transformation(origin = {-26, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecWaterinandIntercooler(redeclare package Medium = Medium_intercooling) annotation(
     Placement(visible = true, transformation(origin = {-52, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));

@@ -12,6 +12,14 @@ model IGT_exhaust_ORC
   package Medium_oil = ThermoCam.Media.TherminolVP1_CP;
   package Medium_ORC = ThermoCam.Media.Toluene_CP;
   package Medium_condenser_cooling = ThermoCam.Media.Air_CP;
+  
+  parameter Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
+  parameter Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
+  parameter Real Xnom_intercooling[0];
+  parameter Real Xnom_oil[0];
+  parameter Real Xnom_ORC[0];
+  parameter Real Xnom_condenser_cooling[0];
+  
   //////////////////////////////////////////////////////////////
   //Ambient conditions
   parameter Real Tcold = 288.15 "unit=K";
@@ -65,7 +73,7 @@ model IGT_exhaust_ORC
   //Minimum admissible temperature difference
   parameter Real DTpinch_hru = 60.0 "unit=K";
   /////////////////////////////////////////////////////////////////
-  parameter Real p_oil = 10.0e5 "unit=Pa";
+  parameter Real p_oil = 20.0e5 "unit=Pa";
   /////////////////////////////////////////////////////////////////
   //Condenser inputs
   parameter Real DPhot_condenser = 5000.0 "unit=Pa";
@@ -93,7 +101,7 @@ model IGT_exhaust_ORC
 
 
 //Declare class instances (must redeclare medium in all instances)
-  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air,X=Xnom) annotation(
     Placement(visible = true, transformation(origin = {-190, -78}, extent = {{-18, -18}, {18, 18}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecInandComp(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-144, -76}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
@@ -109,7 +117,7 @@ model IGT_exhaust_ORC
     Placement(visible = true, transformation(origin = {-52, -128}, extent = {{-28, -28}, {28, 28}}, rotation = 180)));
   ThermoCam.Units.Streamconnector.Streamconnector connecCompandIntercooler(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-88, -94}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  ThermoCam.Sources_and_sinks.Sources.Source_pT waterin(redeclare package Medium = Medium_intercooling, p_su=pcool_intercooling,T_su=Tcool_intercooling) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT waterin(redeclare package Medium = Medium_intercooling, p_su=pcool_intercooling,T_su=Tcool_intercooling,X=Xnom_intercooling) annotation(
     Placement(visible = true, transformation(origin = {14, -136}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecWaterinandIntercooler(redeclare package Medium = Medium_intercooling) annotation(
     Placement(visible = true, transformation(origin = {-12, -136}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
@@ -129,7 +137,7 @@ model IGT_exhaust_ORC
     Placement(visible = true, transformation(origin = {278, -62}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   ThermoCam.Units.Heattransfer.Evaporator evaporator(redeclare package Medium_cold = Medium_ORC,redeclare package Medium_hot=Medium_oil,p_evap=p_orc_exp,DPhot=DPhot_evap,DPcold=DPcold_evap,DTpinch=DTpinch_evap) annotation(
     Placement(visible = true, transformation(origin = {18, 18}, extent = {{-34, -34}, {34, 34}}, rotation = 0)));
-  ThermoCam.Units.LoopBreaker.ClosedLoopConnector closedLoopConnectorOil(redeclare package Medium = Medium_oil) annotation(
+  ThermoCam.Units.LoopBreaker.ClosedLoopConnector closedLoopConnectorOil(redeclare package Medium = Medium_oil,X=Xnom_oil) annotation(
     Placement(visible = true, transformation(origin = {-96, -26}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecHRUandEvaporator(redeclare package Medium = Medium_oil) annotation(
     Placement(visible = true, transformation(origin = {94, 0}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
@@ -147,11 +155,11 @@ model IGT_exhaust_ORC
     Placement(visible = true, transformation(origin = {70, 28}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   ThermoCam.Units.Heattransfer.Condenser condenser(redeclare package Medium_cold = Medium_condenser_cooling, redeclare package Medium_hot=Medium_ORC,DPhot=DPhot_condenser,DPcold=DPcold_condenser,DTpinch=DTpinch_condenser,T_cond = Tcool_condenser_cooling + DTcond + DTpinch_condenser) annotation(
     Placement(visible = true, transformation(origin = {11, 149}, extent = {{-43, -43}, {43, 43}}, rotation = 0)));
-  ThermoCam.Units.LoopBreaker.ClosedLoopConnector closedLoopConnectorORC(redeclare package Medium = Medium_ORC) annotation(
+  ThermoCam.Units.LoopBreaker.ClosedLoopConnector closedLoopConnectorORC(redeclare package Medium = Medium_ORC,X=Xnom_ORC) annotation(
     Placement(visible = true, transformation(origin = {-156, 134}, extent = {{-24, -24}, {24, 24}}, rotation = 0)));
   ThermoCam.Units.Mechanical.Pump pumpORC(redeclare package Medium = Medium_ORC, epsilon_s = epsilon_pump_orc) annotation(
     Placement(visible = true, transformation(origin = {-177, 81}, extent = {{-17, -17}, {17, 17}}, rotation = 0)));
-  ThermoCam.Sources_and_sinks.Sources.Source_pT condensercoolerin(redeclare package Medium = Medium_condenser_cooling, p_su=pcool_condenser_cooling,T_su= Tcool_condenser_cooling) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT condensercoolerin(redeclare package Medium = Medium_condenser_cooling, p_su=pcool_condenser_cooling,T_su= Tcool_condenser_cooling,X=Xnom_condenser_cooling) annotation(
     Placement(visible = true, transformation(origin = {-134, 174}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
   Units.Streamconnector.Streamconnector connecCondenserandCoolerout(redeclare package Medium = Medium_condenser_cooling) annotation(
     Placement(visible = true, transformation(origin = {80, 168}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));

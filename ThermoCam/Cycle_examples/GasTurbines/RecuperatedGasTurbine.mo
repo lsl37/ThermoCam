@@ -5,8 +5,8 @@ model RecuperatedGasTurbine
 //Declare inputs
   package Medium_in = ThermoCam.Media.Air_NASA;
   package Medium_out = ThermoCam.Media.FlueGas_NASA;
-  //Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
-  //Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
+  parameter Medium_in.MassFraction Xnom[Medium_in.nX] = Medium_in.reference_X "Nominal gas composition";
+  parameter Medium_out.MassFraction Xnom_out[Medium_out.nX] = Medium_out.reference_X "Nominal gas composition";
   
   //Ambient conditions
   parameter Real Tcold = 288.15 "unit=K";
@@ -38,7 +38,7 @@ model RecuperatedGasTurbine
 
 
 //Declare class instances (must redeclare medium in all instances)
-  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air) annotation(
+  ThermoCam.Sources_and_sinks.Sources.Source_pT airin(redeclare package Medium = Medium_in, p_su=pcold, T_su=Tcold,m_flow=massflow_air,X=Xnom) annotation(
     Placement(visible = true, transformation(origin = {-200, -4}, extent = {{-18, -18}, {18, 18}}, rotation = 0)));
   ThermoCam.Units.Streamconnector.Streamconnector connecInandComp(redeclare package Medium = Medium_in) annotation(
     Placement(visible = true, transformation(origin = {-146, -4}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));

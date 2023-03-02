@@ -13,7 +13,7 @@ model Sink_T
   Medium.AbsolutePressure p_su(start = p_su_start);
   parameter Medium.Temperature T_su(start = T_su_start);
   Medium.ThermodynamicState FluidIn(p(start = p_nom), T(start = T_nom)) "Thermodynamic state of the fluid at the outlet - isentropic";
- 
+  Medium.MassFraction X[Medium.nXi];
   
   //Initialisation variables
   parameter Modelica.SIunits.Pressure p_su_start = 2.339e5 "Inlet pressure start value";
@@ -24,10 +24,15 @@ model Sink_T
   parameter Medium.SpecificEnthalpy h_su_start = Medium.specificEnthalpy_pTX(p_su_start, T_su_start, Xnom) "Inlet enthalpy start value";
   
 equation
-  FluidIn = Medium.setState_pTX(p_su, T_su, Xnom);
+  if size(X,1) > 0 then
+    FluidIn = Medium.setState_pTX(p_su, T_su, X);
+  else 
+    FluidIn = Medium.setState_pTX(p_su, T_su, Xnom);
+  end if;
   h_su = Medium.specificEnthalpy(FluidIn);
   h_su = inflow.h_outflow;
   p_su = inflow.p;
+  X = inflow.Xi_outflow;
   annotation(
     Icon(graphics = {Polygon(lineColor = {0, 0, 255}, fillColor = {0, 0, 255}, fillPattern = FillPattern.Solid, points = {{-60, 70}, {60, 0}, {-60, -68}, {-60, 70}})}));
 

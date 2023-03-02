@@ -27,14 +27,24 @@ equation
 /*Mass balance*/
   inflow.m_dot + outflow.m_dot = 0;
 /*Fluid properties */
-  fluidState = Medium.setState_phX(inflow.p, inStream(inflow.h_outflow),Xnom);
+  if size(inflow.Xi_outflow,1) > 0 then
+    fluidState = Medium.setState_phX(inflow.p, inStream(inflow.h_outflow), inStream(inflow.Xi_outflow));
+  else
+    fluidState = Medium.setState_phX(inflow.p, inStream(inflow.h_outflow), Xnom);
+  end if;
 /*Momentum balance*/
   DP = outflow.p - inflow.p;
 /*Energy balance, Assumed to be isenthalpic*/
   inflow.h_outflow = outflow.h_outflow;
+/*Species balance*/
+  inflow.Xi_outflow = outflow.Xi_outflow;
 // Boundary conditions, enthalpy stays constant
   inflow.h_outflow = inStream(outflow.h_outflow);
   inStream(inflow.h_outflow) = outflow.h_outflow;
+  
+  inflow.Xi_outflow = inStream(outflow.Xi_outflow);
+  inStream(inflow.Xi_outflow) = outflow.Xi_outflow;
+  
   annotation(
     Icon(graphics = {Polygon(lineColor = {128, 128, 128}, fillColor = {159, 159, 223}, fillPattern = FillPattern.Solid, lineThickness = 0.5, points = {{80, 40}, {0, 0}, {80, -40}, {80, 40}}), Polygon(lineColor = {128, 128, 128}, fillColor = {159, 159, 223}, fillPattern = FillPattern.Solid, lineThickness = 0.5, points = {{-80, 40}, {-80, -40}, {0, 0}, {-80, 40}}), Rectangle(fillPattern = FillPattern.Solid, extent = {{-20, 60}, {20, 40}}), Line(points = {{0, 40}, {0, 0}}, thickness = 0.5)}),
     Diagram(graphics = {Polygon(lineColor = {128, 128, 128}, fillColor = {159, 159, 223}, fillPattern = FillPattern.Solid, lineThickness = 0.5, points = {{80, 40}, {0, 0}, {80, -40}, {80, 40}}), Polygon(lineColor = {128, 128, 128}, fillColor = {159, 159, 223}, fillPattern = FillPattern.Solid, lineThickness = 0.5, points = {{-80, 40}, {-80, -40}, {0, 0}, {-80, 40}}), Rectangle(fillPattern = FillPattern.Solid, extent = {{-20, 60}, {20, 40}}), Line(points = {{0, 40}, {0, 0}}, thickness = 0.5)}));

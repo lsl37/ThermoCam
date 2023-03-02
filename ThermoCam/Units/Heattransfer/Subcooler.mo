@@ -69,8 +69,16 @@ model Subcooler
 
 equation
 /* Fluid Properties */
-  FluidInCold = Medium_cold.setState_phX(p_su_cold, inflow_cold.h_outflow, Xnom_cold);
-  FluidInHot = Medium_hot.setState_phX(p_su_hot, inflow_hot.h_outflow, Xnom_hot);
+  if size(inflow_cold.Xi_outflow, 1) > 0 then
+    FluidInCold = Medium_cold.setState_phX(p_su_cold, inflow_cold.h_outflow, inflow_cold.Xi_outflow);
+  else
+    FluidInCold = Medium_cold.setState_phX(p_su_cold, inflow_cold.h_outflow, Xnom_cold);
+  end if;
+  if size(inflow_hot.Xi_outflow, 1) > 0 then
+    FluidInHot = Medium_hot.setState_phX(p_su_hot, inflow_hot.h_outflow, inflow_hot.Xi_outflow);
+  else
+    FluidInHot = Medium_hot.setState_phX(p_su_hot, inflow_hot.h_outflow, Xnom_hot);
+  end if;
   h_su_cold = Medium_cold.specificEnthalpy(FluidInCold);
   h_su_hot = Medium_hot.specificEnthalpy(FluidInHot);
   T_su_hot = Medium_hot.temperature(FluidInHot);
@@ -79,8 +87,16 @@ equation
   
 //Pinch point based on degree of cooling hot fluid
   T_ex_hot = T_su_hot - DTsubcool;
-  FluidOutCold = Medium_cold.setState_phX(p_ex_cold, h_ex_cold, Xnom_cold);
-  FluidOutHot = Medium_hot.setState_pTX(p_ex_hot, T_ex_hot, Xnom_hot);
+  if size(outflow_cold.Xi_outflow, 1) > 0 then
+    FluidOutCold = Medium_cold.setState_phX(p_ex_cold, h_ex_cold, outflow_cold.Xi_outflow);
+  else 
+    FluidOutCold = Medium_cold.setState_phX(p_ex_cold, h_ex_cold, Xnom_cold);
+  end if;
+  if size(outflow_hot.Xi_outflow, 1) > 0 then
+    FluidOutHot = Medium_hot.setState_pTX(p_ex_hot, T_ex_hot, outflow_hot.Xi_outflow);
+  else 
+    FluidOutHot = Medium_hot.setState_pTX(p_ex_hot, T_ex_hot, Xnom_hot);
+  end if;
   T_ex_cold = Medium_cold.temperature(FluidOutCold);
   outflow_cold.h_outflow = h_ex_cold;
   h_ex_hot = Medium_hot.specificEnthalpy(FluidOutHot);
@@ -112,6 +128,11 @@ equation
   outflow_cold.m_dot = -m_flow_cold;
   m_flow_hot = inflow_hot.m_dot;
   outflow_hot.m_dot = -m_flow_hot;
+  
+//Species balance
+  inflow_cold.Xi_outflow = outflow_cold.Xi_outflow;
+  inflow_hot.Xi_outflow = outflow_hot.Xi_outflow;
+  
   annotation(
     Icon(graphics = {Line(origin = {36, 66}, points = {{0, 0}}), Line(origin = {2, -35}, points = {{54, -1}, {-54, 1}}, color = {255, 0, 0}, thickness = 0.5, arrow = {Arrow.None, Arrow.Open}, arrowSize = 10), Line(origin = {8.01, -11.26}, points = {{-72.0094, -6.7437}, {-60.0094, 1.2563}, {-38.0094, -6.7437}, {-24.0094, 5.2563}, {-6.00941, -2.7437}, {11.9906, 7.2563}, {29.9906, -4.7437}, {45.9906, 7.2563}, {61.9906, -6.7437}, {71.9906, 1.2563}}, color = {255, 0, 0}, thickness = 0.5), Line(origin = {3.39707, 22.225}, points = {{-68.0272, -5.73184}, {-50.0272, 4.26816}, {-34.0272, -5.73184}, {-14.0272, 4.26816}, {-0.0272067, -5.73184}, {21.9728, 6.26816}, {37.9728, -5.73184}, {57.9728, 4.26816}, {67.9728, -5.73184}, {67.9728, -5.73184}}), Line(origin = {2, 48}, points = {{-52, 0}, {52, 0}}, color = {85, 85, 255}, thickness = 0.5, arrow = {Arrow.None, Arrow.Open}, arrowSize = 10), Line(origin = {3.4, 22.23}, points = {{-68.0272, -5.73184}, {-50.0272, 4.26816}, {-34.0272, -5.73184}, {-14.0272, 4.26816}, {-0.0272067, -5.73184}, {21.9728, 6.26816}, {37.9728, -5.73184}, {57.9728, 4.26816}, {67.9728, -5.73184}, {67.9728, -5.73184}}, color = {0, 85, 255}, thickness = 0.5, arrow = {Arrow.None, Arrow.Open}), Text(origin = {7, 6}, extent = {{-63, 40}, {63, -40}}, textString = "Recuperator")}),
     Diagram(graphics = {Line(origin = {0.273333, -1.91444}, points = {{-45.686, -56.7833}, {46.314, 57.2167}, {4.31401, 47.2167}, {6.31401, 47.2167}}, color = {250, 49, 14}, thickness = 0.5), Line(origin = {-17.4167, 37.3056}, points = {{-14, 0}, {14, 0}, {14, 0}}, color = {0, 85, 255}, thickness = 0.5), Line(origin = {0.273333, -1.91444}, points = {{-45.686, -56.7833}, {46.314, 57.2167}, {4.31401, 47.2167}, {6.31401, 47.2167}}, color = {250, 49, 14}, thickness = 0.5), Line(origin = {0.273333, -1.91444}, points = {{-45.686, -56.7833}, {46.314, 57.2167}, {4.31401, 47.2167}, {6.31401, 47.2167}}, color = {250, 49, 14}, thickness = 0.5), Line(origin = {48.5833, 37.3056}, points = {{0, 16}, {0, -16}, {0, -16}}, color = {255, 8, 0}, thickness = 0.5), Line(origin = {6.69333, -12.0744}, points = {{43.8942, -46.6232}, {-38.1058, 47.3768}, {-44.1058, 21.3768}, {-44.1058, 21.3768}}, color = {0, 85, 255}, thickness = 0.5), Line(origin = {0.273333, -1.91444}, points = {{-45.686, -56.7833}, {46.314, 57.2167}, {4.31401, 47.2167}, {6.31401, 47.2167}}, color = {250, 49, 14}, thickness = 0.5), Line(origin = {48.5833, 37.3056}, points = {{0, 16}, {0, -16}, {0, -16}}, color = {255, 8, 0}, thickness = 0.5)}));

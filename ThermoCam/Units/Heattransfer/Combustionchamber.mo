@@ -15,6 +15,10 @@ model Combustionchamber
   Modelica.SIunits.MassFlowRate m_flow "unit=kg/s";
   //Extra mass flow coming from the fuel
   parameter Modelica.SIunits.MassFlowRate m_fuel "unit=kg/s";
+  //Specify outlet gas composition
+  Medium_out.MassFraction X_out[Medium_out.nXi];
+  //Outlet massflow
+  Modelica.SIunits.MassFlowRate m_total "unit=kg/s";
   
   //Initialisation variables
   parameter Modelica.SIunits.Pressure p_su_start = 2.339e5 "Inlet pressure start value";
@@ -35,10 +39,21 @@ model Combustionchamber
     Placement(visible = true, transformation(origin = {-82, 4}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {-82, 4}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Interfaces.Outflow outflow(redeclare package Medium = Medium_out) annotation(
     Placement(visible = true, transformation(origin = {78, 4}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {78, 4}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+
+  
+  
+
 equation
+  //To account for changes with respect to the nominal gas composition
+  //Original built to accomodate humid air into the Combustionchamber
+  for i in 1:Medium_out.nXi loop 
+      X_out[i] = (Xnom_out[i]*abs(m_flow) - Xnom_in[i]*abs(m_flow) + inflow.Xi_outflow[i]*abs(m_flow))/abs(m_flow);
+  end for;
+ 
+
 /* Fluid Properties */
-  FluidIn = Medium_in.setState_phX(p_su, h_su, Xnom_in);
-  FluidOut = Medium_out.setState_phX(p_ex, h_ex, Xnom_out);
+  FluidIn = Medium_in.setState_phX(p_su, h_su, inflow.Xi_outflow);
+  FluidOut = Medium_out.setState_phX(p_ex, h_ex, outflow.Xi_outflow);
 //Momentum balance (assumes negligible pressure drop)
   p_su = p_ex;
   p_su = inflow.p;
@@ -50,9 +65,12 @@ equation
   else
     outflow.m_dot = -(m_flow + m_fuel);
   end if;
+  m_total = abs(outflow.m_dot);
 //Energy balance
   h_su = inflow.h_outflow;
   h_ex = outflow.h_outflow;
+//Species balance
+  outflow.Xi_outflow = X_out;
 //Exit enthalpy
 //Determined by added heat
   Q_add = abs(m_flow)*(h_ex - h_su);

@@ -36,12 +36,21 @@ model Compressor
     Placement(visible = true, transformation(origin = {78, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {78, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
 equation
 /* Fluid Properties */
-  FluidIn = Medium.setState_phX(p_su, h_su, Xnom);
-  FluidOut = Medium.setState_phX(p_ex, h_ex, Xnom);
+  if size(inflow.Xi_outflow,1) > 0 then
+    FluidIn = Medium.setState_phX(p_su, h_su, inflow.Xi_outflow);
+    FluidOut = Medium.setState_phX(p_ex, h_ex, outflow.Xi_outflow);
+  else
+    FluidIn = Medium.setState_phX(p_su, h_su, Xnom);
+    FluidOut = Medium.setState_phX(p_ex, h_ex, Xnom);
+  end if;
 
   s_su = Medium.specificEntropy(FluidIn);
 //Implicit assumption that it is isentropic
-  FluidOut_isentropic = Medium.setState_psX(p_ex, s_su, Xnom);
+  if size(outflow.Xi_outflow,1) > 0 then
+    FluidOut_isentropic = Medium.setState_psX(p_ex, s_su, outflow.Xi_outflow);
+  else
+    FluidOut_isentropic = Medium.setState_psX(p_ex, s_su, Xnom);
+  end if;
   h_ex_s = Medium.specificEnthalpy(FluidOut_isentropic);
 /*equations */
 /*Energy balance*/
@@ -51,6 +60,9 @@ equation
 /* Enthalpies */
   h_su = inflow.h_outflow;
   outflow.h_outflow = h_ex;
+  
+/*Species balance*/
+  inflow.Xi_outflow = outflow.Xi_outflow;
 
 /*Mass flows, mass balance */
   m_flow = inflow.m_dot;
